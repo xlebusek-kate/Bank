@@ -1,9 +1,8 @@
-package org.skypro;
+package org.skypro.Recommendations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
-import java.util.Optional;
 
 public class FullRecommendationsDTO {
 
