@@ -26,9 +26,43 @@
         <tag/>
         <url/>
     </scm>
+
     <properties>
         <java.version>17</java.version>
     </properties>
+
+    <!-- Настраиваем порядок репозиториев: сначала Яндекс, потом Central -->
+    <repositories>
+        <repository>
+            <id>yandex</id>
+            <url>https://mirror.yandex.ru/maven2</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+    </repositories>
+
+    <!-- То же самое для плагинов -->
+<!--    <pluginRepositories>-->
+<!--        <pluginRepository>-->
+<!--            <id>yandex-plugins</id>-->
+<!--            <url>https://mirror.yandex.ru/maven2</url>-->
+<!--            <releases><enabled>true</enabled></releases>-->
+<!--            <snapshots><enabled>false</enabled></snapshots>-->
+<!--        </pluginRepository>-->
+<!--        <pluginRepository>-->
+<!--            <id>central-plugins</id>-->
+<!--            <url>https://repo.maven.apache.org/maven2</url>-->
+<!--            <releases><enabled>true</enabled></releases>-->
+<!--            <snapshots><enabled>false</enabled></snapshots>-->
+<!--        </pluginRepository>-->
+<!--    </pluginRepositories>-->
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -40,9 +74,16 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -67,11 +108,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
@@ -88,6 +124,13 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

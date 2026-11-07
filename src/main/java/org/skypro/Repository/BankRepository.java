@@ -22,7 +22,6 @@ public class BankRepository {
 
     public BankRepository(@Qualifier("BankJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        // Инициализация кэшей внутри конструктора
         this.invest500Cache = Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofHours(1)).build();
         this.topSavingCache = Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofHours(1)).build();
         this.simpleCreditCache = Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofHours(1)).build();
@@ -121,6 +120,13 @@ public class BankRepository {
 
             return isCredit == 0 && sum1Diff && sumWithCondition;
         });
+    }
+
+    // НОВЫЙ МЕТОД ДЛЯ ОЧИСТКИ КЭША
+    public void clearAllCaches() {
+        invest500Cache.invalidateAll();
+        topSavingCache.invalidateAll();
+        simpleCreditCache.invalidateAll();
     }
 
 }

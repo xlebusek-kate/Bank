@@ -2,6 +2,7 @@ package org.skypro.Configuration;
 
 import liquibase.integration.spring.SpringLiquibase;
 import org.skypro.Repository.RepositoryForMyBase.MyDataBaseRepository;
+import org.skypro.Repository.RepositoryForMyBase.RuleStatsRepository;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import jakarta.persistence.EntityManagerFactory;
@@ -18,7 +19,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableJpaRepositories(basePackages = "org.skypro.Repository",
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = MyDataBaseRepository.class )
+                classes = {MyDataBaseRepository.class, RuleStatsRepository.class} )
         , entityManagerFactoryRef = "entityManagerFactory",
         transactionManagerRef = "transactionManager")
 public class BankConfiguration {

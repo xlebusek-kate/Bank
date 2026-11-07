@@ -21,3 +21,10 @@ create table rule_query_arguments(
     rule_query_id bigint references rule_query(id),
     arguments char(255)
 );
+
+--changeset dechernyakov:2
+CREATE TABLE rule_stats (
+                            id BIGSERIAL PRIMARY KEY,
+                            rule_id BIGINT NOT NULL UNIQUE REFERENCES rule_query_dto(id) ON DELETE CASCADE,
+                            count INT NOT NULL DEFAULT 0
+);
