@@ -2,6 +2,7 @@ package org.skypro.Repository;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.skypro.UserInfo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -129,4 +130,13 @@ public class BankRepository {
         simpleCreditCache.invalidateAll();
     }
 
+    public List<UserInfo> findUsersByUsername(String username) {
+        return jdbcTemplate.query(
+                "select ID, FIRST_NAME, LAST_NAME from USERS where USERNAME = ?",
+                (rs, i) -> new UserInfo(
+                        UUID.fromString(rs.getString("ID")),
+                        rs.getString("FIRST_NAME"),
+                        rs.getString("LAST_NAME")),
+                username);
+    }
 }
