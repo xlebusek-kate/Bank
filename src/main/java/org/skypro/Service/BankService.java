@@ -1,8 +1,8 @@
 package org.skypro.Service;
 
+import org.skypro.Entity.EntityForMyBase.RuleQueryDTO;
 import org.skypro.Recommendations.RecommendationsDTO;
 import org.skypro.Repository.BankRepository;
-import org.skypro.Entity.EntityForMyBase.RuleQueryDTO;
 import org.skypro.RuleEvaluator;
 import org.springframework.stereotype.Service;
 
@@ -10,14 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сервис формирования рекомендаций: проверяет статические правила,
+ * заложенные в код, и динамические правила из базы данных.
+ */
 @Service
 public class BankService {
 
     private final BankRepository bankRepository;
-    private final RuleService ruleService;           // Чтобы достать правила из 2-й базы
-    private final RuleEvaluator ruleEvaluator;       // Чтобы проверить правило
-    private final RuleStatsService ruleStatsService; // Чтобы увеличить счетчик
+    private final RuleService ruleService;
+    private final RuleEvaluator ruleEvaluator;
+    private final RuleStatsService ruleStatsService;
 
+    /**
+     * Создаёт сервис.
+     *
+     * @param bankRepository   репозиторий базы знаний (статические правила)
+     * @param ruleService      сервис получения динамических правил
+     * @param ruleEvaluator    проверка динамического правила для пользователя
+     * @param ruleStatsService счётчик срабатываний динамических правил
+     */
     public BankService(BankRepository bankRepository,
                        RuleService ruleService,
                        RuleEvaluator ruleEvaluator,
@@ -28,10 +40,19 @@ public class BankService {
         this.ruleStatsService = ruleStatsService;
     }
 
+    /**
+     * Возвращает рекомендации для пользователя. Сначала проверяются три
+     * статических правила (Invest 500, Top Saving, Простой кредит), затем все
+     * динамические правила из базы. Для каждого сработавшего динамического
+     * правила увеличивается счётчик срабатываний.
+     *
+     * @param uuid идентификатор пользователя
+     * @return список рекомендаций, пустой, если ни одно правило не подошло
+     */
     public List<RecommendationsDTO> getRecommendationsByUUID(UUID uuid) {
         List<RecommendationsDTO> list = new ArrayList<>();
 
-        // --- ТВОИ СТАРЫЕ ЖЕСТКИЕ ПРАВИЛА ---
+        // Статические правила
         if (bankRepository.isInvest500(uuid)) {
             list.add(new RecommendationsDTO("Invest 500", "147f6a0f-3b91-413b-ab99-87f081d60d5a", "Текст..."));
         }
@@ -42,20 +63,16 @@ public class BankService {
             list.add(new RecommendationsDTO("Простой кредит", "ab138afb-f3ba-4a93-b74f-0fcee86d447f", "Текст..."));
         }
 
-        // --- НОВЫЕ ДИНАМИЧЕСКИЕ ПРАВИЛА ИЗ БАЗЫ ---
+        // Динамические правила из базы данных
         List<RuleQueryDTO> dynamicRules = ruleService.getRuleQueryDTO();
         for (RuleQueryDTO rule : dynamicRules) {
-            // 1. Проверяем, подходит ли правило пользователю
             if (ruleEvaluator.isRuleApplicable(rule, uuid)) {
-
-                // 2. Добавляем рекомендацию в список
                 list.add(new RecommendationsDTO(
                         rule.getProductName(),
                         rule.getProductId(),
                         rule.getProductText()
                 ));
-
-                // 3. 👉 ПУНКТ 5: Увеличиваем счетчик срабатывания
+                // Правило сработало: учитываем срабатывание в статистике
                 ruleStatsService.incrementCounter(rule);
             }
         }

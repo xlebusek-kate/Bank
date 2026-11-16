@@ -7,7 +7,17 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * JPA-репозиторий счётчиков срабатывания динамических правил (PostgreSQL).
+ */
 @Repository
 public interface RuleStatsRepository extends JpaRepository<RuleStats, Long> {
+
+    /**
+     * Находит счётчик срабатываний для правила.
+     *
+     * @param rule динамическое правило
+     * @return счётчик или пустой {@link Optional}, если правило ещё не срабатывало
+     */
     Optional<RuleStats> findByRule(RuleQueryDTO rule);
 }
